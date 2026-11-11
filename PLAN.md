@@ -264,7 +264,8 @@ Ei project ta mainly **varsity project**, ar banate banate shekha o uddeshyo. Ta
 | 7 | Rider + Admin | Role based access, admin script | ✅ |
 | 8 | Review + rating | Aggregate query, validation rule | ✅ |
 | 9 | Late Compensation | Datetime logic, wallet/credit | ✅ |
-| 10 | AI feature (recommendation / Banglish assistant) | LLM API, prompt, external API call | |
+| 10 | "Tomar jonno" recommendation | Content-based filtering, scoring, cold start, JOIN | ✅ |
+| 11 | Banglish AI assistant | LLM API, prompt, external API call | ⏭️ next |
 
 **Varsity te joma dewar jonno (shesh er dike banabo):**
 - ER diagram (database design)

@@ -16,8 +16,9 @@ Full plan ar unique feature gula [PLAN.md](PLAN.md) te ache.
 | 7 | Rider delivery, admin approval | [07-rider-ar-admin.md](docs/lessons/07-rider-ar-admin.md) |
 | 8 | Review, restaurant rating | [08-review-ar-rating.md](docs/lessons/08-review-ar-rating.md) |
 | 9 | Late Compensation, wallet | [09-late-compensation-ar-wallet.md](docs/lessons/09-late-compensation-ar-wallet.md) |
+| 10 | "Tomar jonno" recommendation | [10-recommendation.md](docs/lessons/10-recommendation.md) |
 
-Porer step: AI recommendation.
+Porer step: AI assistant.
 
 ## Nijer computer e chalano
 
