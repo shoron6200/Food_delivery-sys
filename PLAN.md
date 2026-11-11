@@ -46,14 +46,14 @@ MVP te 4 ta role er **API** thakbe, kintu UI pore.
 | Part | Choice | Keno |
 |---|---|---|
 | Backend | **Python + FastAPI** | Fast, auto API docs (Swagger), AI/ML integration Python e shobcheye easy |
-| Database | **PostgreSQL** | Relational data (order, user, menu) er jonno best, pore PostGIS diye location query |
-| ORM | SQLAlchemy 2.0 + Alembic (migration) | Standard, stable |
-| Auth | JWT (access + refresh token), phone OTP pore | Simple, mobile friendly |
+| Database | **SQLite** (ekhon) → **PostgreSQL** (pore) | SQLite e kichu install lage na, shekhar jonno shohoj. Pore shudhu `DATABASE_URL` bodlalei PostgreSQL |
+| ORM | SQLAlchemy 2.0 (Alembic migration pore) | Standard, stable |
+| Auth | JWT access token (refresh token + phone OTP pore) | Simple, mobile friendly |
 | Cache / Queue (Phase 2) | Redis | Rider location, real-time order status, rate limit |
 | Real-time (Phase 2) | WebSocket (FastAPI built-in) | Live order tracking |
 | Payment (Phase 2) | Cash on Delivery → pore bKash / Nagad / SSLCommerz | BD market |
 | AI (Phase 3) | LLM API (chat/assistant) + simple ML (ETA, recommendation) | |
-| Deploy | Docker + Docker Compose → VPS / Railway / Render | Cheap start |
+| Deploy (pore) | Docker + Docker Compose → VPS / Railway / Render | Cheap start |
 | Frontend (pore) | Customer: React Native / Flutter, Admin: React (Next.js) | |
 
 ---
@@ -61,15 +61,15 @@ MVP te 4 ta role er **API** thakbe, kintu UI pore.
 ## 4. Phase-wise Roadmap
 
 ### Phase 0: Setup (1-2 din)
-- [ ] Project structure, virtualenv, FastAPI hello world
-- [ ] PostgreSQL + Docker Compose
-- [ ] `.env` config, Alembic migration setup
-- [ ] Basic README
+- [x] Project structure, virtualenv, FastAPI hello world
+- [x] SQLite database, `.env` config
+- [x] Basic README
+- [ ] (pore) PostgreSQL + Docker Compose + Alembic migration
 
 ### Phase 1: Minimal Backend MVP (2-3 week) ⭐ ekhane shuru
 Goal: **ekta order shuru theke shesh porjonto API diye complete kora jabe.**
 
-- [ ] **Auth**: register, login, JWT, role (customer/vendor/rider/admin)
+- [x] **Auth**: register, login, JWT, role (customer/vendor/rider/admin)
 - [ ] **Restaurant**: create/update (vendor), list/search (customer), open/close status
 - [ ] **Menu**: category + item CRUD, price, available on/off
 - [ ] **Cart**: add/remove item (ek somoy ek restaurant)
@@ -137,7 +137,7 @@ Shohoj theke kothin order e:
 ## 6. Database Design (MVP)
 
 ```
-users            (id, name, phone, email, password_hash, role, is_active, created_at)
+users            (id, name, phone, password_hash, role, is_active, created_at)
 addresses        (id, user_id, label, address_text, lat, lng, is_default)
 restaurants      (id, owner_id, name, description, address, lat, lng,
                   is_open, is_approved, avg_prep_minutes, rating, created_at)
@@ -218,10 +218,11 @@ Food_delivery-sys/
 │   ├── api/v1/              # routers: auth, restaurants, cart, orders, rider, admin
 │   ├── services/            # business logic (pricing, order flow, eta)
 │   └── ai/                  # Phase 3: recommendation, assistant, eta model
-├── alembic/                 # DB migrations
+├── docs/lessons/            # step by step lesson (Banglish)
+├── alembic/                 # DB migrations (pore)
 ├── tests/
-├── docker-compose.yml
-├── Dockerfile
+├── docker-compose.yml       # (pore)
+├── Dockerfile               # (pore)
 ├── requirements.txt
 ├── .env.example
 └── README.md
@@ -240,8 +241,34 @@ Food_delivery-sys/
 
 ---
 
-## 10. Next Step (ekhon ki korbo)
+## 10. Varsity Project Version (2nd year) + Shekhar Plan
 
-1. Ei plan review koro, kono feature add/remove korte chaile bolo
-2. **Phase 0 + Phase 1 shuru**: FastAPI project scaffold, DB models, auth
-3. Prottek module shesh hole test + commit
+Ei project ta mainly **varsity project**, ar banate banate shekha o uddeshyo. Tai:
+
+**Scope:** Phase 1 (full order flow) + 2 ta unique feature (Honest Price, Late Compensation) + 1 ta AI feature. Etotukui ekta strong project. Phase 2-4 er baki ongsho report e "Future Work" hisebe jabe.
+
+**Kaj er niyom:** protita step e 4 ta jinish thakbe:
+1. Kaj kora code (chhoto, porar moto)
+2. Automatic test
+3. Banglish lesson (`docs/lessons/`): ki banalam, keno, line by line
+4. "Nije koro" exercise
+
+| Step | Ki banabo | Ki shikhbo | Status |
+|---|---|---|---|
+| 1 | Setup, prothom endpoint | HTTP, API, FastAPI, Swagger | ✅ |
+| 2 | Database, `users` table | ORM, model vs schema, session | ✅ |
+| 3 | Register, login, `/me` | Password hash, JWT, `Depends` | ✅ |
+| 4 | Restaurant + Menu | CRUD, foreign key, relationship, role permission (403) | ⏭️ next |
+| 5 | Cart + Honest Price | Business logic, `services/` layer | |
+| 6 | Order + status flow | State machine, transaction, price snapshot | |
+| 7 | Rider + Admin | Role based access, admin script | |
+| 8 | Review + rating | Aggregate query, validation rule | |
+| 9 | Late Compensation | Datetime logic, wallet/credit | |
+| 10 | AI feature (recommendation / Banglish assistant) | LLM API, prompt, external API call | |
+
+**Varsity te joma dewar jonno (shesh er dike banabo):**
+- ER diagram (database design)
+- Use case diagram (4 ta role)
+- API documentation (Swagger nije theke banay)
+- Test report (`pytest` output)
+- Live demo: ekta order shuru theke shesh
