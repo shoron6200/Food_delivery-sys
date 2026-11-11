@@ -15,8 +15,9 @@ Full plan ar unique feature gula [PLAN.md](PLAN.md) te ache.
 | 6 | Order, status flow | [06-order-ar-status-flow.md](docs/lessons/06-order-ar-status-flow.md) |
 | 7 | Rider delivery, admin approval | [07-rider-ar-admin.md](docs/lessons/07-rider-ar-admin.md) |
 | 8 | Review, restaurant rating | [08-review-ar-rating.md](docs/lessons/08-review-ar-rating.md) |
+| 9 | Late Compensation, wallet | [09-late-compensation-ar-wallet.md](docs/lessons/09-late-compensation-ar-wallet.md) |
 
-Porer step: Late Compensation.
+Porer step: AI recommendation.
 
 ## Nijer computer e chalano
 
@@ -60,11 +61,11 @@ app/
 │   └── database.py   # database connection, session
 ├── models/           # database table (SQLAlchemy)
 ├── schemas/          # request/response er shape (Pydantic)
-├── services/         # byabshar niyom (dam, order er dhap)
+├── services/         # byabshar niyom (dam, order er dhap, compensation)
 └── api/
     ├── deps.py       # shared dependency (current user)
     └── v1/           # endpoint gula (auth, restaurants, cart, orders...)
-scripts/              # terminal theke chalanor script (admin banano)
+scripts/              # terminal theke chalanor script (admin banano, demo helper)
 tests/                # automatic test
 docs/lessons/         # step by step lesson (Banglish)
 ```

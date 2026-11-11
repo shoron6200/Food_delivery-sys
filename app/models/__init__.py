@@ -5,6 +5,7 @@ from app.models.order import Order, OrderItem, OrderStatus
 from app.models.restaurant import MenuItem, Restaurant
 from app.models.review import Review
 from app.models.user import User, UserRole
+from app.models.wallet import WalletTransaction
 
 __all__ = [
     "CartItem",
@@ -16,4 +17,5 @@ __all__ = [
     "Review",
     "User",
     "UserRole",
+    "WalletTransaction",
 ]

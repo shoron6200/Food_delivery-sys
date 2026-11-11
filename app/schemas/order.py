@@ -14,6 +14,8 @@ class OrderCreate(BaseModel):
     delivery_address: str = Field(
         min_length=5, max_length=255, examples=["Flat 4B, House 7, Road 2, Mirpur 10"]
     )
+    # true = pay as much of the bill as possible from wallet credit.
+    use_wallet: bool = False
 
 
 class OrderStatusChange(BaseModel):
@@ -52,6 +54,10 @@ class OrderOut(BaseModel):
     delivery_address: str
     items: list[OrderItemOut]
     price: PriceOut
+    wallet_used: int
+    amount_due: int
     promised_at: datetime
     delivered_at: datetime | None
+    late_minutes: int | None
+    compensation: int
     created_at: datetime

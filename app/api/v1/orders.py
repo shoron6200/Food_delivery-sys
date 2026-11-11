@@ -11,11 +11,14 @@ from sqlalchemy.orm import Session
 from app.api.deps import CurrentUser, Customer, DbSession, Rider, check_taking_orders
 from app.models.order import Order, OrderItem, OrderStatus
 from app.models.restaurant import Restaurant
-from app.models.user import UserRole
+from app.models.user import User, UserRole
+from app.models.wallet import WalletTransaction
 from app.schemas.order import OrderCreate, OrderOut, OrderStatusChange
 from app.services.cart import get_cart_items
+from app.services.compensation import calculate_compensation, minutes_late
 from app.services.orders import is_participant, promised_time, role_allowed_to_change
 from app.services.pricing import calculate_price
+from app.services.wallet import get_balance
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
@@ -94,8 +97,26 @@ def place_order(data: OrderCreate, customer: Customer, db: DbSession):
     db.add(order)
     for cart_item in cart_items:
         db.delete(cart_item)
-    # One commit = one transaction: the order is saved AND the cart is emptied,
-    # or (if anything fails) neither happens.
+
+    if data.use_wallet:
+        # Lock this customer's row until commit, so two orders placed at the
+        # same moment cannot both spend the same credit. (PostgreSQL does the
+        # locking; SQLite skips it because it lets only one writer in anyway.)
+        db.execute(select(User.id).where(User.id == customer.id).with_for_update())
+        db.flush()  # sends the order to the database, so it now has an id
+        order.wallet_used = min(get_balance(db, customer.id), price.total)
+        if order.wallet_used > 0:
+            db.add(
+                WalletTransaction(
+                    user_id=customer.id,
+                    order_id=order.id,
+                    amount=-order.wallet_used,
+                    reason=f"Paid for order #{order.id}",
+                )
+            )
+
+    # One commit = one transaction: the order is saved, the cart is emptied and
+    # the wallet is charged, or (if anything fails) none of it happens.
     db.commit()
     return order
 
@@ -197,6 +218,29 @@ def change_status(
 
     changes = {}
     if data.status == OrderStatus.delivered:
-        changes["delivered_at"] = datetime.now(timezone.utc)
+        now = datetime.now(timezone.utc)
+        late = minutes_late(order.promised_at, now)
+        compensation = calculate_compensation(late, order.price)
+        changes = {"delivered_at": now, "compensation": compensation}
+        if compensation > 0:
+            db.add(
+                WalletTransaction(
+                    user_id=order.customer_id,
+                    order_id=order.id,
+                    amount=compensation,
+                    reason=f"Order #{order.id} arrived {late} minutes late. Sorry!",
+                )
+            )
+    elif data.status in (OrderStatus.cancelled, OrderStatus.rejected):
+        if order.wallet_used > 0:
+            db.add(
+                WalletTransaction(
+                    user_id=order.customer_id,
+                    order_id=order.id,
+                    amount=order.wallet_used,
+                    reason=f"Refund for order #{order.id}",
+                )
+            )
+    # The wallet lines above are saved in the same transaction as the status.
     save_status(db, order, data.status, **changes)
     return order

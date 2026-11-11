@@ -112,9 +112,9 @@ def put_item(client, headers, menu_item_id, quantity=1):
     )
 
 
-def place_order(client, headers, address="Flat 4B, House 7, Mirpur 10, Dhaka"):
+def place_order(client, headers, address="Flat 4B, House 7, Mirpur 10, Dhaka", **extra):
     return client.post(
-        f"{API}/orders", json={"delivery_address": address}, headers=headers
+        f"{API}/orders", json={"delivery_address": address, **extra}, headers=headers
     )
 
 

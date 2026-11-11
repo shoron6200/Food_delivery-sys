@@ -9,6 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.database import Base
 from app.db.types import UtcDateTime
 from app.models.restaurant import Restaurant
+from app.services.compensation import minutes_late
 from app.services.pricing import PriceBreakdown
 
 
@@ -40,10 +41,14 @@ class Order(Base):
     delivery_fee: Mapped[int]
     platform_fee: Mapped[int]
     total: Mapped[int]
+    # Wallet credit the customer chose to spend on this order.
+    wallet_used: Mapped[int] = mapped_column(default=0)
 
     # The time we promised the food would arrive, and when it really did.
     promised_at: Mapped[datetime] = mapped_column(UtcDateTime)
     delivered_at: Mapped[datetime | None] = mapped_column(UtcDateTime)
+    # Wallet credit we paid the customer because this order arrived late.
+    compensation: Mapped[int] = mapped_column(default=0)
     created_at: Mapped[datetime] = mapped_column(UtcDateTime, server_default=func.now())
 
     items: Mapped[list["OrderItem"]] = relationship(order_by="OrderItem.id")
@@ -57,6 +62,18 @@ class Order(Base):
             platform_fee=self.platform_fee,
             total=self.total,
         )
+
+    @property
+    def amount_due(self) -> int:
+        """Cash the rider collects at the door."""
+        return self.total - self.wallet_used
+
+    @property
+    def late_minutes(self) -> int | None:
+        """Minutes after the promised time. None while the order is not delivered."""
+        if self.delivered_at is None:
+            return None
+        return minutes_late(self.promised_at, self.delivered_at)
 
 
 class OrderItem(Base):
