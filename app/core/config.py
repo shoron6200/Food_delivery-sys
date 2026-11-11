@@ -19,5 +19,10 @@ class Settings(BaseSettings):
     # number to run fast; never lower it for a real server.
     bcrypt_rounds: int = Field(default=12, ge=4, le=16)
 
+    # AI assistant (optional). Without a key everything else still works and
+    # the assistant endpoint answers 503.
+    anthropic_api_key: str | None = None
+    assistant_model: str = "claude-opus-5-5"
+
 
 settings = Settings()

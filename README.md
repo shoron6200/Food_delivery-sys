@@ -17,8 +17,7 @@ Full plan ar unique feature gula [PLAN.md](PLAN.md) te ache.
 | 8 | Review, restaurant rating | [08-review-ar-rating.md](docs/lessons/08-review-ar-rating.md) |
 | 9 | Late Compensation, wallet | [09-late-compensation-ar-wallet.md](docs/lessons/09-late-compensation-ar-wallet.md) |
 | 10 | "Tomar jonno" recommendation | [10-recommendation.md](docs/lessons/10-recommendation.md) |
-
-Porer step: AI assistant.
+| 11 | Banglish AI assistant (Claude API) | [11-ai-assistant.md](docs/lessons/11-ai-assistant.md) |
 
 ## Nijer computer e chalano
 

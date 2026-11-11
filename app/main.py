@@ -6,6 +6,7 @@ from fastapi import FastAPI
 
 from app.api.v1 import (
     admin,
+    assistant,
     auth,
     cart,
     orders,
@@ -34,6 +35,7 @@ app.include_router(orders.router, prefix="/api/v1")
 app.include_router(reviews.router, prefix="/api/v1")
 app.include_router(wallet.router, prefix="/api/v1")
 app.include_router(recommendations.router, prefix="/api/v1")
+app.include_router(assistant.router, prefix="/api/v1")
 app.include_router(admin.router, prefix="/api/v1")
 
 
