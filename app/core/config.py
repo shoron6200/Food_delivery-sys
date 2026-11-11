@@ -15,5 +15,9 @@ class Settings(BaseSettings):
     secret_key: str = Field(min_length=32)
     access_token_expire_minutes: int = 60
 
+    # How slow password hashing is. Each +1 doubles the work. Tests use a low
+    # number to run fast; never lower it for a real server.
+    bcrypt_rounds: int = Field(default=12, ge=4, le=16)
+
 
 settings = Settings()

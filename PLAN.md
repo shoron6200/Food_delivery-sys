@@ -72,9 +72,9 @@ Goal: **ekta order shuru theke shesh porjonto API diye complete kora jabe.**
 - [x] **Auth**: register, login, JWT, role (customer/vendor/rider/admin)
 - [x] **Restaurant**: create/update (vendor), list/search (customer), open/close status
 - [x] **Menu**: item create/update, category, price, available on/off
-- [ ] **Cart**: add/remove item (ek somoy ek restaurant)
+- [x] **Cart**: add/remove item (ek somoy ek restaurant)
 - [ ] **Order**: place order (COD), status flow, order history
-- [ ] **Honest Price breakdown**: `/cart/summary` e food + delivery + fee alada kore dekhabe
+- [x] **Honest Price breakdown**: `/cart` e food + delivery + fee alada kore dekhabe
 - [ ] **Rider**: available orders dekha, accept, status update (picked/delivered)
 - [ ] **Admin**: vendor approve, sob order dekha
 - [ ] **Rating & review**: delivered order er por only (fake review kombe)
@@ -144,8 +144,8 @@ restaurants      (id, owner_id, name, description, address,
                   -- pore: is_approved (Step 7), rating (Step 8), lat, lng (Phase 2)
 menu_items       (id, restaurant_id, name, description, price, category, is_available)
                   -- price = purno taka (int). pore: image_url, tags (spicy, veg, healthy...)
-carts            (id, user_id, restaurant_id)
-cart_items       (id, cart_id, menu_item_id, quantity)
+cart_items       (user_id, menu_item_id, quantity)
+                  -- primary key = (user_id, menu_item_id). dam rakhi na, menu theke pori
 orders           (id, customer_id, restaurant_id, rider_id, address_id, status,
                   subtotal, delivery_fee, platform_fee, discount, total,
                   payment_method, payment_status,
@@ -177,10 +177,10 @@ POST   /api/v1/restaurants/{id}/menu-items      (vendor, malik)
 PATCH  /api/v1/menu-items/{id}                  (vendor, malik)
 
 # Cart
-GET    /api/v1/cart
-POST   /api/v1/cart/items
-DELETE /api/v1/cart/items/{id}
-GET    /api/v1/cart/summary          ← Honest Price breakdown
+GET    /api/v1/cart                          ← Honest Price breakdown shoho
+PUT    /api/v1/cart/items/{menu_item_id}     (quantity set kore)
+DELETE /api/v1/cart/items/{menu_item_id}
+DELETE /api/v1/cart                          (cart khali)
 
 # Orders
 POST   /api/v1/orders                (customer, cart theke)
@@ -259,8 +259,8 @@ Ei project ta mainly **varsity project**, ar banate banate shekha o uddeshyo. Ta
 | 2 | Database, `users` table | ORM, model vs schema, session | ✅ |
 | 3 | Register, login, `/me` | Password hash, JWT, `Depends` | ✅ |
 | 4 | Restaurant + Menu | CRUD, foreign key, relationship, role permission (403) | ✅ |
-| 5 | Cart + Honest Price | Business logic, `services/` layer | ⏭️ next |
-| 6 | Order + status flow | State machine, transaction, price snapshot | |
+| 5 | Cart + Honest Price | Business logic, `services/` layer | ✅ |
+| 6 | Order + status flow | State machine, transaction, price snapshot | ⏭️ next |
 | 7 | Rider + Admin | Role based access, admin script | |
 | 8 | Review + rating | Aggregate query, validation rule | |
 | 9 | Late Compensation | Datetime logic, wallet/credit | |

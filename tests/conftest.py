@@ -4,6 +4,7 @@ import os
 import tempfile
 
 os.environ["SECRET_KEY"] = "test-only-secret-key-0123456789-abcdefgh"
+os.environ["BCRYPT_ROUNDS"] = "4"  # fast hashing, for tests only
 os.environ["DATABASE_URL"] = f"sqlite:///{tempfile.mkdtemp()}/test.db"
 
 import pytest  # noqa: E402

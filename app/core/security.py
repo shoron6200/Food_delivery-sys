@@ -12,7 +12,8 @@ ALGORITHM = "HS256"
 
 def hash_password(password: str) -> str:
     """Turn a plain password into a hash that is safe to store."""
-    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+    salt = bcrypt.gensalt(rounds=settings.bcrypt_rounds)
+    return bcrypt.hashpw(password.encode(), salt).decode()
 
 
 def verify_password(password: str, password_hash: str) -> bool:
