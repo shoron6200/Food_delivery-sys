@@ -70,8 +70,8 @@ MVP te 4 ta role er **API** thakbe, kintu UI pore.
 Goal: **ekta order shuru theke shesh porjonto API diye complete kora jabe.**
 
 - [x] **Auth**: register, login, JWT, role (customer/vendor/rider/admin)
-- [ ] **Restaurant**: create/update (vendor), list/search (customer), open/close status
-- [ ] **Menu**: category + item CRUD, price, available on/off
+- [x] **Restaurant**: create/update (vendor), list/search (customer), open/close status
+- [x] **Menu**: item create/update, category, price, available on/off
 - [ ] **Cart**: add/remove item (ek somoy ek restaurant)
 - [ ] **Order**: place order (COD), status flow, order history
 - [ ] **Honest Price breakdown**: `/cart/summary` e food + delivery + fee alada kore dekhabe
@@ -139,11 +139,11 @@ Shohoj theke kothin order e:
 ```
 users            (id, name, phone, password_hash, role, is_active, created_at)
 addresses        (id, user_id, label, address_text, lat, lng, is_default)
-restaurants      (id, owner_id, name, description, address, lat, lng,
-                  is_open, is_approved, avg_prep_minutes, rating, created_at)
-menu_categories  (id, restaurant_id, name, sort_order)
-menu_items       (id, restaurant_id, category_id, name, description, price,
-                  image_url, is_available, tags)          -- tags: spicy, veg, healthy...
+restaurants      (id, owner_id, name, description, address,
+                  is_open, avg_prep_minutes, created_at)
+                  -- pore: is_approved (Step 7), rating (Step 8), lat, lng (Phase 2)
+menu_items       (id, restaurant_id, name, description, price, category, is_available)
+                  -- price = purno taka (int). pore: image_url, tags (spicy, veg, healthy...)
 carts            (id, user_id, restaurant_id)
 cart_items       (id, cart_id, menu_item_id, quantity)
 orders           (id, customer_id, restaurant_id, rider_id, address_id, status,
@@ -168,13 +168,13 @@ POST   /api/v1/auth/login
 GET    /api/v1/auth/me
 
 # Restaurants (public + vendor)
-GET    /api/v1/restaurants?search=&tag=
+GET    /api/v1/restaurants?search=&limit=&offset=
 GET    /api/v1/restaurants/{id}
 GET    /api/v1/restaurants/{id}/menu
 POST   /api/v1/restaurants                      (vendor)
 PATCH  /api/v1/restaurants/{id}                 (vendor)
-POST   /api/v1/restaurants/{id}/menu-items      (vendor)
-PATCH  /api/v1/menu-items/{id}                  (vendor)
+POST   /api/v1/restaurants/{id}/menu-items      (vendor, malik)
+PATCH  /api/v1/menu-items/{id}                  (vendor, malik)
 
 # Cart
 GET    /api/v1/cart
@@ -258,8 +258,8 @@ Ei project ta mainly **varsity project**, ar banate banate shekha o uddeshyo. Ta
 | 1 | Setup, prothom endpoint | HTTP, API, FastAPI, Swagger | ✅ |
 | 2 | Database, `users` table | ORM, model vs schema, session | ✅ |
 | 3 | Register, login, `/me` | Password hash, JWT, `Depends` | ✅ |
-| 4 | Restaurant + Menu | CRUD, foreign key, relationship, role permission (403) | ⏭️ next |
-| 5 | Cart + Honest Price | Business logic, `services/` layer | |
+| 4 | Restaurant + Menu | CRUD, foreign key, relationship, role permission (403) | ✅ |
+| 5 | Cart + Honest Price | Business logic, `services/` layer | ⏭️ next |
 | 6 | Order + status flow | State machine, transaction, price snapshot | |
 | 7 | Rider + Admin | Role based access, admin script | |
 | 8 | Review + rating | Aggregate query, validation rule | |

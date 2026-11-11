@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.security import decode_access_token
 from app.db.database import get_db
-from app.models.user import User
+from app.models.user import User, UserRole
 
 # Tells FastAPI (and the Swagger "Authorize" button) where tokens come from.
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
@@ -32,3 +32,17 @@ def get_current_user(
 
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
+
+
+def require_role(*roles: UserRole):
+    """Build a dependency that lets in only logged-in users with one of these roles."""
+
+    def check_role(user: CurrentUser) -> User:
+        if user.role not in roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to do this",
+            )
+        return user
+
+    return check_role

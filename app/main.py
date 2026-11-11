@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.api.v1 import auth
+from app.api.v1 import auth, restaurants
 from app.core.config import settings
 from app.db.database import Base, engine
 
@@ -19,6 +19,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
 
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(restaurants.router, prefix="/api/v1")
 
 
 @app.get("/", tags=["health"])

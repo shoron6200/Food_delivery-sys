@@ -10,8 +10,9 @@ Full plan ar unique feature gula [PLAN.md](PLAN.md) te ache.
 | 1 | Project setup, FastAPI basics | [01-setup-ar-fastapi-basics.md](docs/lessons/01-setup-ar-fastapi-basics.md) |
 | 2 | Database, `users` table | [02-database-ar-models.md](docs/lessons/02-database-ar-models.md) |
 | 3 | Register, login (JWT), `/me` | [03-auth-password-ar-jwt.md](docs/lessons/03-auth-password-ar-jwt.md) |
+| 4 | Restaurant, menu, role permission | [04-restaurant-ar-menu.md](docs/lessons/04-restaurant-ar-menu.md) |
 
-Porer step: Restaurant + Menu.
+Porer step: Cart + Honest Price.
 
 ## Nijer computer e chalano
 
@@ -57,7 +58,7 @@ app/
 ├── schemas/          # request/response er shape (Pydantic)
 └── api/
     ├── deps.py       # shared dependency (current user)
-    └── v1/           # endpoint gula (auth, pore restaurant, order...)
+    └── v1/           # endpoint gula (auth, restaurants, pore order...)
 tests/                # automatic test
 docs/lessons/         # step by step lesson (Banglish)
 ```
