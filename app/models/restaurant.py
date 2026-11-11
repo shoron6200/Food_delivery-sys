@@ -22,6 +22,9 @@ class Restaurant(Base):
     # New restaurants are hidden from customers until an admin approves them.
     is_approved: Mapped[bool] = mapped_column(default=False)
     avg_prep_minutes: Mapped[int] = mapped_column(default=20)
+    # Running totals of this restaurant's reviews (see average_rating below).
+    rating_sum: Mapped[int] = mapped_column(default=0)
+    review_count: Mapped[int] = mapped_column(default=0)
     created_at: Mapped[datetime] = mapped_column(
         UtcDateTime, server_default=func.now()
     )
@@ -30,6 +33,13 @@ class Restaurant(Base):
     menu_items: Mapped[list["MenuItem"]] = relationship(
         back_populates="restaurant", order_by="MenuItem.id"
     )
+
+    @property
+    def average_rating(self) -> float | None:
+        """Stars out of 5, to one decimal place. None until the first review."""
+        if self.review_count == 0:
+            return None
+        return round(self.rating_sum / self.review_count, 1)
 
 
 class MenuItem(Base):

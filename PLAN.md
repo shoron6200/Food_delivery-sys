@@ -77,7 +77,7 @@ Goal: **ekta order shuru theke shesh porjonto API diye complete kora jabe.**
 - [x] **Honest Price breakdown**: `/cart` e food + delivery + fee alada kore dekhabe
 - [x] **Rider**: available orders dekha, claim, status update (picked/delivered)
 - [x] **Admin**: restaurant approve, sob order dekha
-- [ ] **Rating & review**: delivered order er por only (fake review kombe)
+- [x] **Rating & review**: delivered order er por only (fake review kombe)
 - [ ] Swagger docs e sob test kora jabe
 
 **Order status flow:**
@@ -262,8 +262,8 @@ Ei project ta mainly **varsity project**, ar banate banate shekha o uddeshyo. Ta
 | 5 | Cart + Honest Price | Business logic, `services/` layer | ✅ |
 | 6 | Order + status flow | State machine, transaction, price snapshot | ✅ |
 | 7 | Rider + Admin | Role based access, admin script | ✅ |
-| 8 | Review + rating | Aggregate query, validation rule | ⏭️ next |
-| 9 | Late Compensation | Datetime logic, wallet/credit | |
+| 8 | Review + rating | Aggregate query, validation rule | ✅ |
+| 9 | Late Compensation | Datetime logic, wallet/credit | ⏭️ next |
 | 10 | AI feature (recommendation / Banglish assistant) | LLM API, prompt, external API call | |
 
 **Varsity te joma dewar jonno (shesh er dike banabo):**

@@ -124,6 +124,15 @@ def set_status(client, headers, order_id, new_status):
     )
 
 
+def deliver(client, vendor, rider, order_id) -> None:
+    """Take a placed order all the way to delivered."""
+    set_status(client, vendor, order_id, "accepted")
+    client.post(f"{API}/orders/{order_id}/claim", headers=rider)
+    set_status(client, vendor, order_id, "ready")
+    set_status(client, rider, order_id, "picked_up")
+    set_status(client, rider, order_id, "delivered")
+
+
 @pytest.fixture
 def menu(client, vendor):
     """One open, approved restaurant with two items. Returns their ids."""
@@ -141,3 +150,9 @@ def order(client, customer, menu):
     put_item(client, customer, menu["biryani"], quantity=2)
     put_item(client, customer, menu["borhani"], quantity=1)
     return place_order(client, customer).json()
+
+
+@pytest.fixture
+def delivered_order(client, vendor, rider, order):
+    deliver(client, vendor, rider, order["id"])
+    return order

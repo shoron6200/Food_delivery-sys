@@ -14,8 +14,9 @@ Full plan ar unique feature gula [PLAN.md](PLAN.md) te ache.
 | 5 | Cart, Honest Price breakdown | [05-cart-ar-honest-price.md](docs/lessons/05-cart-ar-honest-price.md) |
 | 6 | Order, status flow | [06-order-ar-status-flow.md](docs/lessons/06-order-ar-status-flow.md) |
 | 7 | Rider delivery, admin approval | [07-rider-ar-admin.md](docs/lessons/07-rider-ar-admin.md) |
+| 8 | Review, restaurant rating | [08-review-ar-rating.md](docs/lessons/08-review-ar-rating.md) |
 
-Porer step: Review + rating.
+Porer step: Late Compensation.
 
 ## Nijer computer e chalano
 

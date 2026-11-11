@@ -39,6 +39,8 @@ class RestaurantOut(BaseModel):
     is_open: bool
     is_approved: bool
     avg_prep_minutes: int
+    average_rating: float | None
+    review_count: int
     created_at: datetime
 
 
