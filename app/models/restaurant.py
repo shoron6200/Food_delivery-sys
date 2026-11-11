@@ -19,6 +19,8 @@ class Restaurant(Base):
     description: Mapped[str | None] = mapped_column(String(500))
     address: Mapped[str] = mapped_column(String(255))
     is_open: Mapped[bool] = mapped_column(default=True)
+    # New restaurants are hidden from customers until an admin approves them.
+    is_approved: Mapped[bool] = mapped_column(default=False)
     avg_prep_minutes: Mapped[int] = mapped_column(default=20)
     created_at: Mapped[datetime] = mapped_column(
         UtcDateTime, server_default=func.now()

@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.security import decode_access_token
 from app.db.database import get_db
+from app.models.restaurant import Restaurant
 from app.models.user import User, UserRole
 
 # Tells FastAPI (and the Swagger "Authorize" button) where tokens come from.
@@ -53,3 +54,15 @@ Customer = Annotated[User, Depends(require_role(UserRole.customer))]
 Vendor = Annotated[User, Depends(require_role(UserRole.vendor))]
 Rider = Annotated[User, Depends(require_role(UserRole.rider))]
 Admin = Annotated[User, Depends(require_role(UserRole.admin))]
+
+
+def check_taking_orders(restaurant: Restaurant) -> None:
+    """Stop with 409 if customers cannot order from this restaurant right now."""
+    if not restaurant.is_approved:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "This restaurant is not approved yet"
+        )
+    if not restaurant.is_open:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "This restaurant is closed right now"
+        )

@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import delete
 from sqlalchemy.orm import Session
 
-from app.api.deps import Customer, DbSession
+from app.api.deps import Customer, DbSession, check_taking_orders
 from app.models.cart import CartItem
 from app.models.restaurant import MenuItem
 from app.schemas.cart import CartItemSet, CartLineOut, CartOut
@@ -52,10 +52,7 @@ def set_cart_item(
         raise HTTPException(
             status.HTTP_409_CONFLICT, "This item is not available right now"
         )
-    if not menu_item.restaurant.is_open:
-        raise HTTPException(
-            status.HTTP_409_CONFLICT, "This restaurant is closed right now"
-        )
+    check_taking_orders(menu_item.restaurant)
 
     cart_items = get_cart_items(db, customer.id)
     if any(

@@ -75,8 +75,8 @@ Goal: **ekta order shuru theke shesh porjonto API diye complete kora jabe.**
 - [x] **Cart**: add/remove item (ek somoy ek restaurant)
 - [x] **Order**: place order (COD), status flow, order history
 - [x] **Honest Price breakdown**: `/cart` e food + delivery + fee alada kore dekhabe
-- [ ] **Rider**: available orders dekha, accept, status update (picked/delivered)
-- [ ] **Admin**: vendor approve, sob order dekha
+- [x] **Rider**: available orders dekha, claim, status update (picked/delivered)
+- [x] **Admin**: restaurant approve, sob order dekha
 - [ ] **Rating & review**: delivered order er por only (fake review kombe)
 - [ ] Swagger docs e sob test kora jabe
 
@@ -261,8 +261,8 @@ Ei project ta mainly **varsity project**, ar banate banate shekha o uddeshyo. Ta
 | 4 | Restaurant + Menu | CRUD, foreign key, relationship, role permission (403) | ✅ |
 | 5 | Cart + Honest Price | Business logic, `services/` layer | ✅ |
 | 6 | Order + status flow | State machine, transaction, price snapshot | ✅ |
-| 7 | Rider + Admin | Role based access, admin script | ⏭️ next |
-| 8 | Review + rating | Aggregate query, validation rule | |
+| 7 | Rider + Admin | Role based access, admin script | ✅ |
+| 8 | Review + rating | Aggregate query, validation rule | ⏭️ next |
 | 9 | Late Compensation | Datetime logic, wallet/credit | |
 | 10 | AI feature (recommendation / Banglish assistant) | LLM API, prompt, external API call | |
 

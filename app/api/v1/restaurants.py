@@ -1,7 +1,8 @@
 """Restaurant and menu endpoints.
 
 Anyone can read. Only a vendor can create a restaurant, and only its owner
-can change it or its menu.
+can change it or its menu. A new restaurant shows up in the public list only
+after an admin approves it.
 """
 
 from typing import Annotated
@@ -61,7 +62,7 @@ def list_restaurants(
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
     offset: Annotated[int, Query(ge=0)] = 0,
 ):
-    query = select(Restaurant)
+    query = select(Restaurant).where(Restaurant.is_approved)
     if search:
         # autoescape: a "%" typed by the user is searched as a plain character.
         query = query.where(Restaurant.name.icontains(search, autoescape=True))
@@ -81,6 +82,20 @@ def create_restaurant(data: RestaurantCreate, vendor: Vendor, db: DbSession):
     db.add(restaurant)
     db.commit()
     return restaurant
+
+
+# Must stay above "/restaurants/{restaurant_id}", or "mine" would be read as an id.
+@router.get(
+    "/restaurants/mine", response_model=list[RestaurantOut], tags=["restaurants"]
+)
+def list_my_restaurants(vendor: Vendor, db: DbSession):
+    """A vendor's own restaurants, including ones still waiting for approval."""
+    query = (
+        select(Restaurant)
+        .where(Restaurant.owner_id == vendor.id)
+        .order_by(Restaurant.id)
+    )
+    return db.scalars(query).all()
 
 
 @router.get(

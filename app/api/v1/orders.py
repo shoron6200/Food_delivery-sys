@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
-from app.api.deps import CurrentUser, Customer, DbSession
+from app.api.deps import CurrentUser, Customer, DbSession, Rider, check_taking_orders
 from app.models.order import Order, OrderItem, OrderStatus
 from app.models.restaurant import Restaurant
 from app.models.user import UserRole
@@ -58,10 +58,7 @@ def place_order(data: OrderCreate, customer: Customer, db: DbSession):
         raise HTTPException(status.HTTP_409_CONFLICT, "Your cart is empty")
 
     restaurant = cart_items[0].menu_item.restaurant
-    if not restaurant.is_open:
-        raise HTTPException(
-            status.HTTP_409_CONFLICT, "This restaurant is closed right now"
-        )
+    check_taking_orders(restaurant)
     unavailable = [
         cart_item.menu_item.name
         for cart_item in cart_items
@@ -126,9 +123,61 @@ def list_my_orders(
     return db.scalars(query).all()
 
 
+# Statuses in which an order is cooking or packed and may still need a rider.
+WAITING_FOR_RIDER = (OrderStatus.accepted, OrderStatus.ready)
+
+
+# Must stay above "/{order_id}": routes are tried top to bottom, and
+# "available" would otherwise be read as an order id.
+@router.get("/available", response_model=list[OrderOut])
+def list_available_orders(rider: Rider, db: DbSession):
+    """Orders that still need a rider, oldest first."""
+    query = (
+        select(Order)
+        .where(Order.status.in_(WAITING_FOR_RIDER), Order.rider_id.is_(None))
+        .order_by(Order.id)
+        .limit(50)
+    )
+    return db.scalars(query).all()
+
+
 @router.get("/{order_id}", response_model=OrderOut)
 def read_order(order: MyOrder):
     return order
+
+
+@router.post("/{order_id}/claim", response_model=OrderOut)
+def claim_order(order_id: int, rider: Rider, db: DbSession):
+    """A rider takes a delivery. The first rider to ask gets it."""
+    busy = db.scalar(
+        select(Order.id).where(
+            Order.rider_id == rider.id,
+            Order.status.in_((*WAITING_FOR_RIDER, OrderStatus.picked_up)),
+        )
+    )
+    if busy is not None:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, f"Finish your delivery of order {busy} first"
+        )
+
+    # "Is it still free?" and "make it mine" in one statement, so two riders
+    # asking at the same moment cannot both get the order.
+    result = db.execute(
+        update(Order)
+        .where(
+            Order.id == order_id,
+            Order.rider_id.is_(None),
+            Order.status.in_(WAITING_FOR_RIDER),
+        )
+        .values(rider_id=rider.id)
+    )
+    if result.rowcount != 1:
+        db.rollback()
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "This order is not available for delivery"
+        )
+    db.commit()
+    return db.get(Order, order_id)
 
 
 @router.patch("/{order_id}/status", response_model=OrderOut)

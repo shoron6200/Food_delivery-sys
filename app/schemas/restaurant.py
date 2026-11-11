@@ -37,6 +37,7 @@ class RestaurantOut(BaseModel):
     description: str | None
     address: str
     is_open: bool
+    is_approved: bool
     avg_prep_minutes: int
     created_at: datetime
 
@@ -74,3 +75,7 @@ class MenuItemOut(BaseModel):
     price: int
     category: str
     is_available: bool
+
+
+class RestaurantApproval(BaseModel):
+    is_approved: bool

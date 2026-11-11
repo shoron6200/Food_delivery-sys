@@ -10,7 +10,9 @@ os.environ["DATABASE_URL"] = f"sqlite:///{tempfile.mkdtemp()}/test.db"
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
 
-from app.db.database import Base, engine  # noqa: E402
+from app.core.security import hash_password  # noqa: E402
+from app.db.database import Base, SessionLocal, engine  # noqa: E402
+from app.models import Restaurant, User, UserRole  # noqa: E402
 from app.main import app  # noqa: E402
 
 
@@ -30,8 +32,12 @@ def make_user(client, phone: str, role: str = "customer") -> dict[str, str]:
         "/api/v1/auth/register",
         json={"name": f"Test {role}", "phone": phone, "password": password, "role": role},
     )
+    return login(client, phone)
+
+
+def login(client, phone: str) -> dict[str, str]:
     response = client.post(
-        "/api/v1/auth/login", data={"username": phone, "password": password}
+        "/api/v1/auth/login", data={"username": phone, "password": "test-password"}
     )
     return {"Authorization": f"Bearer {response.json()['access_token']}"}
 
@@ -56,14 +62,40 @@ def rider(client):
     return make_user(client, "01755555555", "rider")
 
 
+@pytest.fixture
+def admin(client):
+    """Admins cannot register through the API, so this one goes straight into the database."""
+    with SessionLocal() as db:
+        db.add(
+            User(
+                name="Test admin",
+                phone="01700000000",
+                password_hash=hash_password("test-password"),
+                role=UserRole.admin,
+            )
+        )
+        db.commit()
+    return login(client, "01700000000")
+
+
 # ---------- Helpers shared by the test files ----------
 
 API = "/api/v1"
 
 
+def approve(restaurant_id: int) -> None:
+    """Approve a restaurant directly in the database (the admin API has its own tests)."""
+    with SessionLocal() as db:
+        db.get(Restaurant, restaurant_id).is_approved = True
+        db.commit()
+
+
 def add_restaurant(client, vendor, name="Kacchi Ghor") -> int:
+    """Create a restaurant that is already approved. Returns its id."""
     body = {"name": name, "address": "House 12, Road 5, Dhanmondi, Dhaka"}
-    return client.post(f"{API}/restaurants", json=body, headers=vendor).json()["id"]
+    restaurant_id = client.post(f"{API}/restaurants", json=body, headers=vendor).json()["id"]
+    approve(restaurant_id)
+    return restaurant_id
 
 
 def add_menu_item(client, vendor, restaurant_id, name, price, category="Food") -> int:
@@ -94,7 +126,7 @@ def set_status(client, headers, order_id, new_status):
 
 @pytest.fixture
 def menu(client, vendor):
-    """One open restaurant with two items. Returns their ids."""
+    """One open, approved restaurant with two items. Returns their ids."""
     restaurant_id = add_restaurant(client, vendor)
     return {
         "restaurant": restaurant_id,

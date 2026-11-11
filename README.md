@@ -13,8 +13,9 @@ Full plan ar unique feature gula [PLAN.md](PLAN.md) te ache.
 | 4 | Restaurant, menu, role permission | [04-restaurant-ar-menu.md](docs/lessons/04-restaurant-ar-menu.md) |
 | 5 | Cart, Honest Price breakdown | [05-cart-ar-honest-price.md](docs/lessons/05-cart-ar-honest-price.md) |
 | 6 | Order, status flow | [06-order-ar-status-flow.md](docs/lessons/06-order-ar-status-flow.md) |
+| 7 | Rider delivery, admin approval | [07-rider-ar-admin.md](docs/lessons/07-rider-ar-admin.md) |
 
-Porer step: Rider + Admin.
+Porer step: Review + rating.
 
 ## Nijer computer e chalano
 
@@ -62,6 +63,7 @@ app/
 └── api/
     ├── deps.py       # shared dependency (current user)
     └── v1/           # endpoint gula (auth, restaurants, cart, orders...)
+scripts/              # terminal theke chalanor script (admin banano)
 tests/                # automatic test
 docs/lessons/         # step by step lesson (Banglish)
 ```

@@ -1,3 +1,5 @@
+from tests.conftest import approve
+
 KACCHI = {"name": "Kacchi Ghor", "address": "House 12, Road 5, Dhanmondi, Dhaka"}
 BIRYANI = {"name": "Kacchi Biryani", "price": 320, "category": "Biryani"}
 
@@ -23,6 +25,7 @@ def test_vendor_creates_restaurant(client, vendor):
     body = response.json()
     assert body["name"] == "Kacchi Ghor"
     assert body["is_open"] is True
+    assert body["is_approved"] is False
     assert body["avg_prep_minutes"] == 20
 
     me = client.get("/api/v1/auth/me", headers=vendor).json()
@@ -44,7 +47,8 @@ def test_owner_id_in_body_is_ignored(client, vendor):
 
 def test_anyone_can_list_and_read_restaurants(client, vendor):
     restaurant_id = create_restaurant(client, vendor).json()["id"]
-    create_restaurant(client, vendor, name="Burger Lab")
+    approve(restaurant_id)
+    approve(create_restaurant(client, vendor, name="Burger Lab").json()["id"])
 
     names = [r["name"] for r in client.get("/api/v1/restaurants").json()]
     assert names == ["Kacchi Ghor", "Burger Lab"]
@@ -52,21 +56,21 @@ def test_anyone_can_list_and_read_restaurants(client, vendor):
 
 
 def test_search_ignores_case(client, vendor):
-    create_restaurant(client, vendor)
-    create_restaurant(client, vendor, name="Burger Lab")
+    approve(create_restaurant(client, vendor).json()["id"])
+    approve(create_restaurant(client, vendor, name="Burger Lab").json()["id"])
 
     found = client.get("/api/v1/restaurants", params={"search": "KACCHI"}).json()
     assert [r["name"] for r in found] == ["Kacchi Ghor"]
 
 
 def test_search_percent_is_not_a_wildcard(client, vendor):
-    create_restaurant(client, vendor)
+    approve(create_restaurant(client, vendor).json()["id"])
     assert client.get("/api/v1/restaurants", params={"search": "%"}).json() == []
 
 
 def test_limit_and_offset(client, vendor):
     for name in ["One Cafe", "Two Cafe", "Three Cafe"]:
-        create_restaurant(client, vendor, name=name)
+        approve(create_restaurant(client, vendor, name=name).json()["id"])
 
     page = client.get("/api/v1/restaurants", params={"limit": 2, "offset": 1}).json()
     assert [r["name"] for r in page] == ["Two Cafe", "Three Cafe"]
@@ -105,6 +109,33 @@ def test_other_vendor_cannot_update_restaurant(client, vendor, other_vendor):
 
 def test_anonymous_update_is_401_even_if_restaurant_is_missing(client):
     assert client.patch("/api/v1/restaurants/999", json={"name": "Nope"}).status_code == 401
+
+
+def test_unapproved_restaurant_is_hidden_from_public_list(client, vendor):
+    create_restaurant(client, vendor)
+    assert client.get("/api/v1/restaurants").json() == []
+
+
+def test_vendor_sees_own_restaurants_even_before_approval(client, vendor, other_vendor):
+    create_restaurant(client, vendor)
+
+    mine = client.get("/api/v1/restaurants/mine", headers=vendor).json()
+    assert [r["name"] for r in mine] == ["Kacchi Ghor"]
+    assert client.get("/api/v1/restaurants/mine", headers=other_vendor).json() == []
+
+
+def test_mine_is_for_vendors_only(client, customer):
+    assert client.get("/api/v1/restaurants/mine", headers=customer).status_code == 403
+    assert client.get("/api/v1/restaurants/mine").status_code == 401
+
+
+def test_vendor_cannot_approve_own_restaurant(client, vendor):
+    restaurant_id = create_restaurant(client, vendor).json()["id"]
+
+    response = client.patch(
+        f"/api/v1/restaurants/{restaurant_id}", json={"is_approved": True}, headers=vendor
+    )
+    assert response.json()["is_approved"] is False
 
 
 # ---------- Menu ----------
