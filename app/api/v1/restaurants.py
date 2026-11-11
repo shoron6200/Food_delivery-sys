@@ -9,9 +9,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 
-from app.api.deps import DbSession, require_role
+from app.api.deps import DbSession, Vendor
 from app.models.restaurant import MenuItem, Restaurant
-from app.models.user import User, UserRole
+from app.models.user import User
 from app.schemas.restaurant import (
     MenuItemCreate,
     MenuItemOut,
@@ -22,8 +22,6 @@ from app.schemas.restaurant import (
 )
 
 router = APIRouter()
-
-Vendor = Annotated[User, Depends(require_role(UserRole.vendor))]
 
 
 def get_restaurant(restaurant_id: int, db: DbSession) -> Restaurant:

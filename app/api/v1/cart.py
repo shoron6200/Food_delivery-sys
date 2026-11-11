@@ -1,30 +1,17 @@
 """Cart endpoints. Every answer includes the full Honest Price breakdown."""
 
-from typing import Annotated
-
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import delete, select
+from fastapi import APIRouter, HTTPException, status
+from sqlalchemy import delete
 from sqlalchemy.orm import Session
 
-from app.api.deps import DbSession, require_role
+from app.api.deps import Customer, DbSession
 from app.models.cart import CartItem
 from app.models.restaurant import MenuItem
-from app.models.user import User, UserRole
 from app.schemas.cart import CartItemSet, CartLineOut, CartOut
+from app.services.cart import get_cart_items
 from app.services.pricing import calculate_price
 
 router = APIRouter(prefix="/cart", tags=["cart"])
-
-Customer = Annotated[User, Depends(require_role(UserRole.customer))]
-
-
-def get_cart_items(db: Session, user_id: int) -> list[CartItem]:
-    query = (
-        select(CartItem)
-        .where(CartItem.user_id == user_id)
-        .order_by(CartItem.menu_item_id)
-    )
-    return list(db.scalars(query))
 
 
 def build_cart(db: Session, user_id: int) -> CartOut:

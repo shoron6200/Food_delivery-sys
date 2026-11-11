@@ -2,10 +2,11 @@
 
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, String, func
+from sqlalchemy import ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
+from app.db.types import UtcDateTime
 
 
 class Restaurant(Base):
@@ -20,7 +21,7 @@ class Restaurant(Base):
     is_open: Mapped[bool] = mapped_column(default=True)
     avg_prep_minutes: Mapped[int] = mapped_column(default=20)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
+        UtcDateTime, server_default=func.now()
     )
 
     # Not a column. Lets us write restaurant.menu_items to get the items.

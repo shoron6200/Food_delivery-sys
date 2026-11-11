@@ -12,8 +12,9 @@ Full plan ar unique feature gula [PLAN.md](PLAN.md) te ache.
 | 3 | Register, login (JWT), `/me` | [03-auth-password-ar-jwt.md](docs/lessons/03-auth-password-ar-jwt.md) |
 | 4 | Restaurant, menu, role permission | [04-restaurant-ar-menu.md](docs/lessons/04-restaurant-ar-menu.md) |
 | 5 | Cart, Honest Price breakdown | [05-cart-ar-honest-price.md](docs/lessons/05-cart-ar-honest-price.md) |
+| 6 | Order, status flow | [06-order-ar-status-flow.md](docs/lessons/06-order-ar-status-flow.md) |
 
-Porer step: Order + status flow.
+Porer step: Rider + Admin.
 
 ## Nijer computer e chalano
 
@@ -57,10 +58,10 @@ app/
 │   └── database.py   # database connection, session
 ├── models/           # database table (SQLAlchemy)
 ├── schemas/          # request/response er shape (Pydantic)
-├── services/         # byabshar niyom (dam er hishab)
+├── services/         # byabshar niyom (dam, order er dhap)
 └── api/
     ├── deps.py       # shared dependency (current user)
-    └── v1/           # endpoint gula (auth, restaurants, cart, pore order...)
+    └── v1/           # endpoint gula (auth, restaurants, cart, orders...)
 tests/                # automatic test
 docs/lessons/         # step by step lesson (Banglish)
 ```

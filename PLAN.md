@@ -73,7 +73,7 @@ Goal: **ekta order shuru theke shesh porjonto API diye complete kora jabe.**
 - [x] **Restaurant**: create/update (vendor), list/search (customer), open/close status
 - [x] **Menu**: item create/update, category, price, available on/off
 - [x] **Cart**: add/remove item (ek somoy ek restaurant)
-- [ ] **Order**: place order (COD), status flow, order history
+- [x] **Order**: place order (COD), status flow, order history
 - [x] **Honest Price breakdown**: `/cart` e food + delivery + fee alada kore dekhabe
 - [ ] **Rider**: available orders dekha, accept, status update (picked/delivered)
 - [ ] **Admin**: vendor approve, sob order dekha
@@ -82,9 +82,9 @@ Goal: **ekta order shuru theke shesh porjonto API diye complete kora jabe.**
 
 **Order status flow:**
 ```
-PLACED → ACCEPTED (restaurant) → PREPARING → READY_FOR_PICKUP
-       → PICKED_UP (rider) → DELIVERED
-       ↘ REJECTED / CANCELLED
+placed → accepted (restaurant) → ready (restaurant)
+       → picked_up (rider) → delivered (rider)
+placed → rejected (restaurant) / cancelled (customer)
 ```
 
 ### Phase 2: Real App er moto (3-4 week)
@@ -260,8 +260,8 @@ Ei project ta mainly **varsity project**, ar banate banate shekha o uddeshyo. Ta
 | 3 | Register, login, `/me` | Password hash, JWT, `Depends` | ✅ |
 | 4 | Restaurant + Menu | CRUD, foreign key, relationship, role permission (403) | ✅ |
 | 5 | Cart + Honest Price | Business logic, `services/` layer | ✅ |
-| 6 | Order + status flow | State machine, transaction, price snapshot | ⏭️ next |
-| 7 | Rider + Admin | Role based access, admin script | |
+| 6 | Order + status flow | State machine, transaction, price snapshot | ✅ |
+| 7 | Rider + Admin | Role based access, admin script | ⏭️ next |
 | 8 | Review + rating | Aggregate query, validation rule | |
 | 9 | Late Compensation | Datetime logic, wallet/credit | |
 | 10 | AI feature (recommendation / Banglish assistant) | LLM API, prompt, external API call | |

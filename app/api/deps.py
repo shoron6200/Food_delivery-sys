@@ -46,3 +46,10 @@ def require_role(*roles: UserRole):
         return user
 
     return check_role
+
+
+# Ready-made "only this role" dependencies for the routers.
+Customer = Annotated[User, Depends(require_role(UserRole.customer))]
+Vendor = Annotated[User, Depends(require_role(UserRole.vendor))]
+Rider = Annotated[User, Depends(require_role(UserRole.rider))]
+Admin = Annotated[User, Depends(require_role(UserRole.admin))]

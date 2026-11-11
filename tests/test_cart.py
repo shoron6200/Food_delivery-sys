@@ -1,39 +1,5 @@
-import pytest
-
 from app.services.pricing import DELIVERY_FEE, PLATFORM_FEE
-from tests.conftest import make_user
-
-API = "/api/v1"
-
-
-def add_restaurant(client, vendor, name="Kacchi Ghor"):
-    body = {"name": name, "address": "House 12, Road 5, Dhanmondi, Dhaka"}
-    return client.post(f"{API}/restaurants", json=body, headers=vendor).json()["id"]
-
-
-def add_menu_item(client, vendor, restaurant_id, name, price):
-    body = {"name": name, "price": price, "category": "Food"}
-    response = client.post(
-        f"{API}/restaurants/{restaurant_id}/menu-items", json=body, headers=vendor
-    )
-    return response.json()["id"]
-
-
-@pytest.fixture
-def menu(client, vendor):
-    """One open restaurant with two items. Returns their ids."""
-    restaurant_id = add_restaurant(client, vendor)
-    return {
-        "restaurant": restaurant_id,
-        "biryani": add_menu_item(client, vendor, restaurant_id, "Kacchi Biryani", 320),
-        "borhani": add_menu_item(client, vendor, restaurant_id, "Borhani", 60),
-    }
-
-
-def put_item(client, headers, menu_item_id, quantity=1):
-    return client.put(
-        f"{API}/cart/items/{menu_item_id}", json={"quantity": quantity}, headers=headers
-    )
+from tests.conftest import API, add_menu_item, add_restaurant, make_user, put_item
 
 
 def test_new_cart_is_empty_and_free(client, customer):
