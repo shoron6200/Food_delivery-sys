@@ -2,7 +2,7 @@
 
 Ei lesson er code: `app/models/review.py`, `app/schemas/review.py`, `app/api/v1/reviews.py`, `app/models/restaurant.py` (`average_rating`)
 
-**Age eta koro:** `restaurants` table e notun column esheche (`rating_sum`, `review_count`). `food_delivery.db` muche abar server chalao.
+Ei step e table e notun column jog hoyechilo. Tumi shesh obosthar code chalale database e shob age thekei ache, kichu muchte hobe na.
 
 ## 1. Ki banalam
 
@@ -104,7 +104,7 @@ def customer_name(self) -> str:
 
 ## 7. Swagger e try koro
 
-Lesson 7, section 7 er puro golpo ta abar koro (database notun, tai admin o abar banate hobe), order `delivered` porjonto nao. Tarpor:
+Lesson 7, section 7 er golpo ta diye ekta order `delivered` porjonto nao. Tarpor:
 
 1. **Customer:** `POST /orders/{id}/review` e `{"rating": 4, "comment": "Bhalo"}`
 2. Ek e request abar. `409`

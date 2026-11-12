@@ -66,7 +66,7 @@ MVP te 4 ta role er **API** thakbe, kintu UI pore.
 - [x] Basic README
 - [ ] (pore) PostgreSQL + Docker Compose + Alembic migration
 
-### Phase 1: Minimal Backend MVP (2-3 week) ⭐ ekhane shuru
+### Phase 1: Minimal Backend MVP ✅ shesh
 Goal: **ekta order shuru theke shesh porjonto API diye complete kora jabe.**
 
 - [x] **Auth**: register, login, JWT, role (customer/vendor/rider/admin)
@@ -78,7 +78,7 @@ Goal: **ekta order shuru theke shesh porjonto API diye complete kora jabe.**
 - [x] **Rider**: available orders dekha, claim, status update (picked/delivered)
 - [x] **Admin**: restaurant approve, sob order dekha
 - [x] **Rating & review**: delivered order er por only (fake review kombe)
-- [ ] Swagger docs e sob test kora jabe
+- [x] Swagger docs e sob test kora jabe
 
 **Order status flow:**
 ```
@@ -94,15 +94,15 @@ placed → rejected (restaurant) / cancelled (customer)
 - [ ] Live order tracking (WebSocket + Redis e rider location)
 - [ ] Push notification (FCM)
 - [ ] bKash/Nagad/SSLCommerz payment
-- [ ] Wallet + credit system (refund/compensation ekhane jabe)
-- [ ] **Late Compensation engine**: promised_eta vs delivered_at compare, auto credit
+- [x] Wallet + credit system (compensation, khoroch, ferot)
+- [x] **Late Compensation engine**: promised_at vs delivered_at compare, auto credit
 - [ ] Coupon/promo
 
 ### Phase 3: AI Features (ongoing) 🤖
 Shohoj theke kothin order e:
 
-1. **Smart Recommendation**: order history + time (dupur/raat) + weather diye "Tomar jonno" list
-2. **AI Food Assistant (chat / Banglish)**:
+1. ✅ **Smart Recommendation**: order history + rating diye "Tomar jonno" list (pore: time, weather)
+2. ✅ **AI Food Assistant (Banglish)**:
    - "500 takay 3 jon er dinner, biryani na" → menu theke filter kore combo suggest
    - Bangla + Banglish + English sob bujhbe
    - Pore **voice order** ("Gotobar er order ta abar dao")
@@ -134,32 +134,29 @@ Shohoj theke kothin order e:
 
 ---
 
-## 6. Database Design (MVP)
+## 6. Database Design (ja banano hoyeche)
 
 ```
-users            (id, name, phone, password_hash, role, is_active, created_at)
-addresses        (id, user_id, label, address_text, lat, lng, is_default)
-restaurants      (id, owner_id, name, description, address,
-                  is_open, avg_prep_minutes, created_at)
-                  -- pore: is_approved (Step 7), rating (Step 8), lat, lng (Phase 2)
-menu_items       (id, restaurant_id, name, description, price, category, is_available)
-                  -- price = purno taka (int). pore: image_url, tags (spicy, veg, healthy...)
-cart_items       (user_id, menu_item_id, quantity)
-                  -- primary key = (user_id, menu_item_id). dam rakhi na, menu theke pori
-orders           (id, customer_id, restaurant_id, rider_id, address_id, status,
-                  subtotal, delivery_fee, platform_fee, discount, total,
-                  payment_method, payment_status,
-                  promised_eta, delivered_at, created_at)
-order_items      (id, order_id, menu_item_id, name_snapshot, price_snapshot, quantity)
-order_status_log (id, order_id, status, changed_by, created_at)
-reviews          (id, order_id, customer_id, restaurant_id, rating, comment, created_at)
+users               (id, name, phone, password_hash, role, is_active, created_at)
+restaurants         (id, owner_id, name, description, address, is_open, is_approved,
+                     avg_prep_minutes, rating_sum, review_count, created_at)
+menu_items          (id, restaurant_id, name, description, price, category, is_available)
+cart_items          (user_id, menu_item_id, quantity)        -- primary key = (user_id, menu_item_id)
+orders              (id, customer_id, restaurant_id, rider_id, delivery_address, status,
+                     subtotal, delivery_fee, platform_fee, total, wallet_used,
+                     promised_at, delivered_at, compensation, created_at)
+order_items         (id, order_id, menu_item_id, name, unit_price, quantity)
+reviews             (id, order_id, customer_id, restaurant_id, rating, comment, created_at)
+wallet_transactions (id, user_id, order_id, amount, reason, created_at)
 ```
 
-**Note:** `order_items` e `price_snapshot` rakhchi karon pore menu price change hole purono order er hishab thik thakbe. `promised_eta` + `delivered_at` diye Phase 2 te late compensation calculate hobe.
+**Note:** shob dam purno taka, `int`. `order_items` e `name` ar `unit_price` copy kore rakha, tai pore menu bodlale purono order thik thake. Wallet er balance kothao save nai, sheta `wallet_transactions.amount` er jogfol. ER diagram: [docs/project-report.md](docs/project-report.md).
+
+Pore: `addresses` table, `lat` / `lng` (Phase 2), `menu_items` e `image_url` ar `tags`.
 
 ---
 
-## 7. API Endpoints (MVP)
+## 7. API Endpoints (ja banano hoyeche)
 
 ```
 # Auth
@@ -167,40 +164,44 @@ POST   /api/v1/auth/register
 POST   /api/v1/auth/login
 GET    /api/v1/auth/me
 
-# Restaurants (public + vendor)
-GET    /api/v1/restaurants?search=&limit=&offset=
+# Restaurants + menu
+GET    /api/v1/restaurants?search=&limit=&offset=      (shudhu approved)
+GET    /api/v1/restaurants/mine                         (vendor)
 GET    /api/v1/restaurants/{id}
+POST   /api/v1/restaurants                              (vendor)
+PATCH  /api/v1/restaurants/{id}                         (malik)
 GET    /api/v1/restaurants/{id}/menu
-POST   /api/v1/restaurants                      (vendor)
-PATCH  /api/v1/restaurants/{id}                 (vendor)
-POST   /api/v1/restaurants/{id}/menu-items      (vendor, malik)
-PATCH  /api/v1/menu-items/{id}                  (vendor, malik)
+POST   /api/v1/restaurants/{id}/menu-items              (malik)
+PATCH  /api/v1/menu-items/{id}                          (malik)
 
-# Cart
-GET    /api/v1/cart                          ← Honest Price breakdown shoho
-PUT    /api/v1/cart/items/{menu_item_id}     (quantity set kore)
+# Cart (customer)
+GET    /api/v1/cart                                     <- Honest Price breakdown shoho
+PUT    /api/v1/cart/items/{menu_item_id}
 DELETE /api/v1/cart/items/{menu_item_id}
-DELETE /api/v1/cart                          (cart khali)
+DELETE /api/v1/cart
 
 # Orders
-POST   /api/v1/orders                (customer, cart theke)
-GET    /api/v1/orders                (nijer orders)
+POST   /api/v1/orders                                   (customer; use_wallet optional)
+GET    /api/v1/orders?status=                           (role onujayi nijer order)
+GET    /api/v1/orders/available                         (rider)
 GET    /api/v1/orders/{id}
-POST   /api/v1/orders/{id}/cancel
-PATCH  /api/v1/vendor/orders/{id}/status    (accept/reject/preparing/ready)
-
-# Rider
-GET    /api/v1/rider/orders/available
-POST   /api/v1/rider/orders/{id}/accept
-PATCH  /api/v1/rider/orders/{id}/status     (picked_up/delivered)
+POST   /api/v1/orders/{id}/claim                        (rider)
+PATCH  /api/v1/orders/{id}/status                       (dhap onujayi vendor / rider / customer)
 
 # Review
-POST   /api/v1/orders/{id}/review
+POST   /api/v1/orders/{id}/review                       (customer, delivered order)
+GET    /api/v1/restaurants/{id}/reviews
+
+# Wallet
+GET    /api/v1/wallet                                   (customer)
+
+# AI
+GET    /api/v1/recommendations                          (customer)
+POST   /api/v1/assistant/suggest                        (customer; ANTHROPIC_API_KEY lage)
 
 # Admin
-GET    /api/v1/admin/restaurants?approved=false
-POST   /api/v1/admin/restaurants/{id}/approve
-GET    /api/v1/admin/orders
+GET    /api/v1/admin/restaurants?approved=
+PATCH  /api/v1/admin/restaurants/{id}                   (approve / batil)
 ```
 
 ---
@@ -211,24 +212,28 @@ GET    /api/v1/admin/orders
 Food_delivery-sys/
 ├── app/
 │   ├── main.py              # FastAPI app entry
-│   ├── core/                # config, security (JWT, hashing), dependencies
-│   ├── db/                  # session, base
-│   ├── models/              # SQLAlchemy models (user, restaurant, order...)
+│   ├── core/                # config, security (JWT, hashing)
+│   ├── db/                  # database connection, UTC datetime type
+│   ├── models/              # SQLAlchemy models (table)
 │   ├── schemas/             # Pydantic request/response
-│   ├── api/v1/              # routers: auth, restaurants, cart, orders, rider, admin
-│   ├── services/            # business logic (pricing, order flow, eta)
-│   └── ai/                  # Phase 3: recommendation, assistant, eta model
-├── docs/lessons/            # step by step lesson (Banglish)
-├── alembic/                 # DB migrations (pore)
-├── tests/
-├── docker-compose.yml       # (pore)
-├── Dockerfile               # (pore)
+│   ├── api/
+│   │   ├── deps.py          # current user, role check
+│   │   └── v1/              # routers: auth, restaurants, cart, orders, reviews,
+│   │                        #          wallet, recommendations, assistant, admin
+│   └── services/            # business logic: pricing, orders, compensation,
+│                            #                 wallet, recommend, assistant, rate_limit
+├── scripts/                 # create_admin, seed_demo, make_order_late
+├── tests/                   # 155 ta automatic test
+├── docs/
+│   ├── lessons/             # 11 ta step by step lesson (Banglish)
+│   ├── project-report.md    # diagram, feature, shimabaddhota
+│   └── demo-guide.md        # presentation er golpo
 ├── requirements.txt
 ├── .env.example
 └── README.md
 ```
 
-**Rule:** router e logic na, `services/` e business logic. Tahole pore AI/feature add korle code clean thakbe.
+**Rule:** router e HTTP er kaj, `services/` e byabshar niyom. Pore: `alembic/` (migration), `Dockerfile`, `docker-compose.yml`.
 
 ---
 
@@ -267,9 +272,10 @@ Ei project ta mainly **varsity project**, ar banate banate shekha o uddeshyo. Ta
 | 10 | "Tomar jonno" recommendation | Content-based filtering, scoring, cold start, JOIN | ✅ |
 | 11 | Banglish AI assistant | LLM API, prompt, structured output, rate limit, mocking | ✅ |
 
-**Varsity te joma dewar jonno (shesh er dike banabo):**
-- ER diagram (database design)
-- Use case diagram (4 ta role)
-- API documentation (Swagger nije theke banay)
-- Test report (`pytest` output)
-- Live demo: ekta order shuru theke shesh
+**Varsity te joma dewar jonno (shob toiri):**
+- ER diagram, use case diagram, state diagram, architecture: [docs/project-report.md](docs/project-report.md)
+- API documentation: server chaliye `/docs` (Swagger nije theke banay)
+- Test report: `python -m pytest -v` er output
+- Live demo r golpo: [docs/demo-guide.md](docs/demo-guide.md)
+
+**Varsity scope shesh.** Er por jete chaile Phase 2 (upore section 4) theke shuru: PostgreSQL + Alembic, location, payment, live tracking.

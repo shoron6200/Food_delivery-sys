@@ -138,7 +138,8 @@ Ek cart e ek restaurant keno? Karon ekta order ekta restaurant theke ekjon rider
 
 ## 9. Swagger e try koro
 
-1. Vendor diye login kore ekta restaurant ar 2 ta menu item banao (Lesson 4)
+1. Shohoj upay: `python -m scripts.seed_demo` chalao (khali database e). Eta approved restaurant, menu ar 4 ta account baniye dey; password `demo-pass-123`, phone gula terminal e dekhabe.
+   Karon: approve na kora restaurant theke cart e kichu newa jay na (Lesson 7)
 2. **Customer** account diye Authorize koro
 3. `PUT /cart/items/{menu_item_id}` e `{"quantity": 2}` pathao. `price` ongsho ta dekho
 4. Ek e request abar pathao. Total bodlalo?
@@ -149,6 +150,7 @@ Ek cart e ek restaurant keno? Karon ekta order ekta restaurant theke ekjon rider
 1. **Free delivery:** niyom banao, `subtotal` 500 taka ba beshi hole `delivery_fee` 0.
    Age `tests/test_pricing.py` te 2 ta test lekho (499 takay fee ache, 500 takay nai), dekho fail kore. Tarpor `pricing.py` thik koro.
    Kheyal koro: `cart.py` te **ek line o** hat dite hoy ni, tao cart e notun niyom chole esheche. Eitai services layer er labh.
+   Onno file er kichu test o ekhon fail korbe (jara 500 takar beshi order e 40 taka fee asha kore). Sheta thik: niyom bodlale purono test jane na. Dekhe niye change ta **firiye nio**, pore r lesson 40 taka dhore lekha.
 2. Ek bar e shorbocho 20 ta item newa jay. Ei niyom kon file e? 10 korte chaile ki bodlabe?
 3. `CartOut` e `item_count` field jog koro (shob quantity er jogfol). Schema ar `build_cart` duitai bodlate hobe.
 4. Viva proshno, nijer bhashay uttor dao:

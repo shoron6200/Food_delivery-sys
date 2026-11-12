@@ -4,7 +4,7 @@ Ei lesson er code: `app/api/v1/admin.py`, `app/api/v1/orders.py` (`/available`, 
 
 Ei step er por **4 ta role i kaj kore**, ar ekta order restaurant theke customer er dorja porjonto jay.
 
-**Age eta koro:** `restaurants` table e notun column (`is_approved`) esheche. Tai `food_delivery.db` file ta **muche dao**, tarpor server chalao (Lesson 2, section 5).
+Ei step e table e notun column jog hoyechilo. Tumi shesh obosthar code chalale database e shob age thekei ache, kichu muchte hobe na.
 
 ## 1. Ki banalam
 

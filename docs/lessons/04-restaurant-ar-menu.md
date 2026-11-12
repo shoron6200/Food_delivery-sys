@@ -2,7 +2,7 @@
 
 Ei lesson er code: `app/models/restaurant.py`, `app/schemas/restaurant.py`, `app/api/v1/restaurants.py`, `app/api/deps.py` (shesh er `require_role`)
 
-Purono `food_delivery.db` muchte hobe na. Notun table gula server chalu holei toiri hoye jabe.
+Ei lesson likhar shomoy restaurant e `is_approved`, rating ar `/restaurants/mine` chilo na. Egula Lesson 7 ar 8 e jog hoyeche, tai code e ektu beshi dekhbe. Ekhon shudhu ei lesson er ongshotuku te mon dao.
 
 ## 1. Ki banalam
 
@@ -178,11 +178,13 @@ for field, value in data.model_dump(exclude_none=True).items():
 4. Logout kore `GET /restaurants/{id}/menu` chalao. Login chharai dekha jay
 5. Ekta **customer** account diye login kore `POST /restaurants` chalao. `403` ashbe
 
+Notun restaurant `GET /restaurants` list e **dekha jabe na** jotokkhon na admin approve kore (Lesson 7). Tar age `GET /restaurants/{id}` ba `GET /restaurants/mine` diye dekho.
+
 ## 11. Nije koro
 
 1. `GET /restaurants` e notun query parameter jog koro: `open_only: bool = False`. `true` hole shudhu khola restaurant ashbe.
    Hint: `query = query.where(Restaurant.is_open)`. Tarpor `tests/test_restaurants.py` te er jonno ekta test lekho.
 2. `Restaurant` e `phone` column jog koro (model, `RestaurantCreate`, `RestaurantUpdate`, `RestaurantOut`). Server chaliye `GET /restaurants` e jao. Error ashbe. Keno? (Lesson 2, section 5 dekho.)
-3. Challenge: `GET /restaurants/mine` banao, jeta login kora vendor er nijer restaurant gula dey.
-   Shabdhan: eta `GET /restaurants/{restaurant_id}` er **upore** likhte hobe. Niche likhle ki hoy try kore dekho, ar bhabo keno.
+3. `restaurants.py` te `GET /restaurants/mine` ache (vendor er nijer restaurant gula; Lesson 7 e jog hoyeche). Eta `GET /restaurants/{restaurant_id}` er **upore** lekha.
+   Niche niye gele ki hoy try kore dekho, ar bhabo keno. Tarpor firiye rakho. (Uttor Lesson 7, section 4 e.)
 4. Nijer bhashay bolo: ekjon customer onner restaurant `PATCH` korte gele `403` pay, ar login chhara gele `401`. Parthokko ta ki?

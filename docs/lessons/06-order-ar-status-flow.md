@@ -141,9 +141,7 @@ Shob shomoy **UTC** te rakha hoy (`datetime.now(timezone.utc)`), ar uttor e `Z` 
 
 ## 8. Swagger e try koro
 
-Database e notun table esheche, purono file muchte hobe na.
-
-1. Vendor diye restaurant + menu banao. Customer diye cart e item dao (Lesson 5)
+1. `python -m scripts.seed_demo` er account gula use koro (Lesson 5, section 9). Customer diye cart e item dao
 2. Customer: `POST /orders` e `delivery_address` dao. `price` ta cart er shathe milao
 3. Customer: `GET /cart`. Khali?
 4. Vendor diye Authorize: `GET /orders`, tarpor `PATCH /orders/{id}/status` e `{"status": "accepted"}`

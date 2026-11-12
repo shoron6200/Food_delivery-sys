@@ -4,7 +4,7 @@ Ei lesson er code: `app/services/compensation.py`, `app/models/wallet.py`, `app/
 
 Eta amader **dwitiyo unique feature**. Onno app e khabar late hole support e chat kore, chobi diye, torko kore taka ferot nite hoy. Amader app e: **late holei wallet e taka, kichu bolte hoy na.**
 
-**Age eta koro:** `orders` table e notun column esheche. `food_delivery.db` muche abar server chalao.
+Ei step e table e notun column jog hoyechilo. Tumi shesh obosthar code chalale database e shob age thekei ache, kichu muchte hobe na.
 
 ## 1. Ki banalam
 
